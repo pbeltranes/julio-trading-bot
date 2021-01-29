@@ -27,20 +27,32 @@ const privateBuda = new Buda(api_key, api_secret);
 //privateBuda.new_fiat_deposit('CLP', 250000).then(function(result) { console.log(result) });
 //privateBuda.new_crypto_address('BTC').then(function(result) { console.log(result) });
 //privateBuda.get_address('BTC',30216).then(function(result) { console.log(result) });
-exports.getExchange = async (currency) => {
+exports.getExchange = async (marketCodes) => {
   try {
-    const exch = await privateBuda.ticker(currency);
-    const exchToSave = {
-      marketId: exch.ticker.market_id,
-      lastPrice: exch.ticker.last_price,
-      minAsk: exch.ticker.min_ask,
-      maxBid: exch.ticker.max_bid,
-      volume: exch.ticker.volume,
-      priceVariation24h: exch.ticker.price_variation_24h,
-      priceVariation7d: exch.ticker.price_variation_7d
-    };
+    const actualValues = await Promise.all(
+      marketCodes.map(async (marketCode) => {
+        exch = await privateBuda.ticker(marketCode);
+        return {
+          marketId: exch.ticker.market_id,
+          lastPrice: exch.ticker.last_price,
+          minAsk: exch.ticker.min_ask,
+          maxBid: exch.ticker.max_bid,
+          volume: exch.ticker.volume,
+          priceVariation24h: exch.ticker.price_variation_24h,
+          priceVariation7d: exch.ticker.price_variation_7d
+        };
+      })
+    );
 
-    return Currency.create({ currency: exchToSave });
+    await Currency.insertMany(actualValues);
+
+    const result = new Map(
+      actualValues.map((av) => [
+        av.marketId,
+        { minAsk: av.minAsk, maxBid: av.maxBid }
+      ])
+    );
+    return result;
   } catch (err) {
     console.log(err);
   }
