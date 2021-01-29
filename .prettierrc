@@ -1,0 +1,8 @@
+{
+  "singleQuote": true,
+  "tabWidth": 2,
+  "semi": true,
+  "trailingComma": "none",
+  "endOfLine": "auto",
+  "no-console": ["error", { "allow": ["warn", "error"] }]
+}
