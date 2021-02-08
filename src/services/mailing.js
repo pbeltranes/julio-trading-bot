@@ -16,6 +16,11 @@ var mailOptions = {
   text: 'Contenido del email'
 };
 
+/**
+ * @task armar email de compra
+ * @task armar email de venta
+ * 
+ */
 exports.buy = () => {
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
