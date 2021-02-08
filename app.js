@@ -4,10 +4,11 @@ const cookieParser = require('cookie-parser');
 // const moment = require('moment')
 const helmet = require('helmet');
 const cors = require('cors');
-require('dotenv').config()
+require('dotenv').config();
 // Services
 const db = require('./src/loaders/mongodb');
 const julios = require('./src/services/julio');
+const mailing = require('./src/services/mailing');
 // const cron = require('./API/v1/services/cron')
 
 const app = express();
@@ -36,8 +37,9 @@ app.use((req, res, next) => {
   next(createError(404));
 });
 db.init();
+julios.getMarketValues()
+// julios.getMarketValues();
 
-julios.getMarketValues();
 app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
